@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/firestore_service.dart';
+import 'join_playlist_screen.dart';
 import 'playlist_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -8,25 +9,75 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final service = FirestoreService();
+    final TextEditingController nameController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Vibzcheck Home")),
-      body: const Center(child: Text("Create or Join a Playlist")),
+      appBar: AppBar(title: const Text("Vibzcheck Home"), centerTitle: true),
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await service.createPlaylist(name: "New Playlist");
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
 
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text("Playlist Created")));
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: "Playlist Name",
+                border: OutlineInputBorder(),
+              ),
+            ),
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const PlaylistScreen()),
-          );
-        },
-        child: const Icon(Icons.add),
+            const SizedBox(height: 10),
+
+            ElevatedButton(
+              onPressed: () async {
+                if (nameController.text.isEmpty) return;
+
+                await service.createPlaylist(name: nameController.text);
+
+                nameController.clear();
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Playlist Created")),
+                );
+              },
+              child: const Text("Create Playlist"),
+            ),
+
+            const SizedBox(height: 30),
+
+            const Divider(),
+
+            const SizedBox(height: 20),
+
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const JoinPlaylistScreen()),
+                );
+              },
+              icon: const Icon(Icons.login),
+              label: const Text("Join Playlist"),
+            ),
+
+            const SizedBox(height: 20),
+
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const PlaylistScreen(playlistId: "test"),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.music_note),
+              label: const Text("Open Playlist Screen (Test)"),
+            ),
+          ],
+        ),
       ),
     );
   }
