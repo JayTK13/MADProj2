@@ -9,7 +9,6 @@ class PlaylistScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final db = FirebaseFirestore.instance;
     final service = FirestoreService();
 
     final titleController = TextEditingController();
@@ -67,6 +66,10 @@ class PlaylistScreen extends StatelessWidget {
 
                 final songs = snapshot.data!.docs;
 
+                if (songs.isEmpty) {
+                  return const Center(child: Text("No song added yet"));
+                }
+
                 return ListView.builder(
                   itemCount: songs.length,
                   itemBuilder: (context, index) {
@@ -74,9 +77,26 @@ class PlaylistScreen extends StatelessWidget {
 
                     return ListTile(
                       leading: const Icon(Icons.music_note),
+
                       title: Text(song['title']),
                       subtitle: Text(song['artist']),
-                      trailing: Text("Votes: ${song['votes']}"),
+
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("🔥 ${song['votes'] ?? 0}"),
+
+                          IconButton(
+                            icon: const Icon(Icons.thumb_up),
+                            onPressed: () {
+                              service.voteSong(
+                                playlistId: playlistId,
+                                songId: song.id,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     );
                   },
                 );
