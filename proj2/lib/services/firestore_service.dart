@@ -6,10 +6,11 @@ class FirestoreService {
 
   Future<void> createPlaylist({required String name}) async {
     final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
     await _db.collection('playlists').add({
       'name': name,
-      'hostId': user!.uid,
+      'hostId': user.uid,
       'createdAt': Timestamp.now(),
       'currentSongId': '',
       'isActive': true,
@@ -17,7 +18,20 @@ class FirestoreService {
     });
   }
 
+  Future<void> joinPlaylist(String playlistId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    await _db.collection('playlists').doc(playlistId).update({
+      'members': FieldValue.arrayUnion([user.uid]),
+    });
+  }
+
   Stream<QuerySnapshot> getPlaylists() {
     return _db.collection('playlists').snapshots();
+  }
+
+  Stream<DocumentSnapshot> getPlaylist(String playlistId) {
+    return _db.collection('playlists').doc(playlistId).snapshots();
   }
 }
