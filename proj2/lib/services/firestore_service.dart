@@ -29,11 +29,37 @@ class FirestoreService {
     });
   }
 
+  Future<void> addSong({
+    required String playlistId,
+    required String title,
+    required String artist,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    await _db.collection('playlists').doc(playlistId).collection('songs').add({
+      'title': title,
+      'artist': artist,
+      'votes': 0,
+      'moodTags': [],
+      'addedBy': user.uid,
+      'createdAt': Timestamp.now(),
+    });
+  }
+
   Stream<QuerySnapshot> getPlaylists() {
     return _db.collection('playlists').snapshots();
   }
 
   Stream<DocumentSnapshot> getPlaylist(String playlistId) {
     return _db.collection('playlists').doc(playlistId).snapshots();
+  }
+
+  Stream<QuerySnapshot> getSongs(String playlistId) {
+    return _db
+        .collection('playlists')
+        .doc(playlistId)
+        .collection('songs')
+        .snapshots();
   }
 }

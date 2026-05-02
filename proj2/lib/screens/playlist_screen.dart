@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/firestore_service.dart';
 
 class PlaylistScreen extends StatelessWidget {
   final String playlistId;
@@ -9,85 +10,80 @@ class PlaylistScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final db = FirebaseFirestore.instance;
+    final service = FirestoreService();
+
+    final titleController = TextEditingController();
+    final artistController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(title: const Text("Playlist Room")),
 
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: db.collection('playlists').doc(playlistId).snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text("Playlist not found"));
-          }
-
-          final data = snapshot.data!.data() as Map<String, dynamic>;
-
-          final String name = data['name'] ?? 'Unnamed Playlist';
-          final String hostId = data['hostId'] ?? '';
-          final List members = data['members'] ?? [];
-
-          return Padding(
-            padding: const EdgeInsets.all(16),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(labelText: "Song Title"),
                 ),
-
+                TextField(
+                  controller: artistController,
+                  decoration: const InputDecoration(labelText: "Artist"),
+                ),
                 const SizedBox(height: 10),
 
-                Text("Host: $hostId"),
-                Text("Members: ${members.length}"),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (titleController.text.isEmpty ||
+                        artistController.text.isEmpty)
+                      return;
 
-                const SizedBox(height: 20),
+                    await service.addSong(
+                      playlistId: playlistId,
+                      title: titleController.text,
+                      artist: artistController.text,
+                    );
 
-                const Divider(),
-
-                const Text(
-                  "Songs will appear here",
-                  style: TextStyle(fontSize: 16),
-                ),
-
-                const SizedBox(height: 10),
-
-                const Text(
-                  "Voting + queue system coming next...(Placeholder)",
-                  style: TextStyle(color: Colors.grey),
-                ),
-
-                const SizedBox(height: 20),
-
-                const Text(
-                  "Members",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-
-                const SizedBox(height: 10),
-
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: members.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: const Icon(Icons.person),
-                        title: Text(members[index]),
-                      );
-                    },
-                  ),
+                    titleController.clear();
+                    artistController.clear();
+                  },
+                  child: const Text("Add Song"),
                 ),
               ],
             ),
-          );
-        },
+          ),
+
+          const Divider(),
+
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: service.getSongs(playlistId),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final songs = snapshot.data!.docs;
+
+                return ListView.builder(
+                  itemCount: songs.length,
+                  itemBuilder: (context, index) {
+                    final song = songs[index];
+
+                    return ListTile(
+                      leading: const Icon(Icons.music_note),
+                      title: Text(song['title']),
+                      subtitle: Text(song['artist']),
+                      trailing: Text("Votes: ${song['votes']}"),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
