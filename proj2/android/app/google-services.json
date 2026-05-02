@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "311723193427",
+    "project_id": "jaden-proj2",
+    "storage_bucket": "jaden-proj2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311723193427:android:4567e8a227207fbc67c2a6",
+        "android_client_info": {
+          "package_name": "com.example.proj2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCf-SNgP7FAzUvFhGHVLsJyxIuWu6FKEMg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
