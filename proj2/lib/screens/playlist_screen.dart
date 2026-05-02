@@ -60,7 +60,7 @@ class PlaylistScreen extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 const Text(
-                  "Voting + queue system coming next...",
+                  "Voting + queue system coming next...(Placeholder)",
                   style: TextStyle(color: Colors.grey),
                 ),
 

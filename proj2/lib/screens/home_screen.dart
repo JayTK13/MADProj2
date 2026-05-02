@@ -34,12 +34,28 @@ class HomeScreen extends StatelessWidget {
               onPressed: () async {
                 if (nameController.text.isEmpty) return;
 
-                await service.createPlaylist(name: nameController.text);
+                final playlistId = await service.createPlaylist(
+                  name: nameController.text,
+                );
 
                 nameController.clear();
 
+                if (playlistId == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Failed to create playlist")),
+                  );
+                  return;
+                }
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Playlist Created")),
+                );
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PlaylistScreen(playlistId: playlistId),
+                  ),
                 );
               },
               child: const Text("Create Playlist"),
@@ -60,21 +76,6 @@ class HomeScreen extends StatelessWidget {
               },
               icon: const Icon(Icons.login),
               label: const Text("Join Playlist"),
-            ),
-
-            const SizedBox(height: 20),
-
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const PlaylistScreen(playlistId: "test"),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.music_note),
-              label: const Text("Open Playlist Screen (Test)"),
             ),
           ],
         ),
