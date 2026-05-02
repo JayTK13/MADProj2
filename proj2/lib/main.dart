@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-
+import 'screens/test_firestore_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Vibzcheck',
       theme: ThemeData(primarySwatch: Colors.deepPurple),
-      home: const Scaffold(body: Center(child: Text('Vibzcheck is running '))),
+      home: const TestFirestoreScreen(),
     );
   }
 }
