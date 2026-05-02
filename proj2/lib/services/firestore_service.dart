@@ -89,15 +89,41 @@ class FirestoreService {
         .snapshots();
   }
 
-  
   Stream<List<QueryDocumentSnapshot>> getTopSongs(String playlistId) {
-  return _db
-      .collection('playlists')
-      .doc(playlistId)
-      .collection('songs')
-      .orderBy('votes', descending: true)
-      .limit(3)
-      .snapshots()
-      .map((snapshot) => snapshot.docs);
+    return _db
+        .collection('playlists')
+        .doc(playlistId)
+        .collection('songs')
+        .orderBy('votes', descending: true)
+        .limit(3)
+        .snapshots()
+        .map((snapshot) => snapshot.docs);
+  }
+
+  Future<void> sendMessage({
+    required String playlistId,
+    required String text,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    await _db
+        .collection('playlists')
+        .doc(playlistId)
+        .collection('messages')
+        .add({
+          'text': text,
+          'senderId': user.uid,
+          'timestamp': Timestamp.now(),
+        });
+  }
+
+  Stream<QuerySnapshot> getMessages(String playlistId) {
+    return _db
+        .collection('playlists')
+        .doc(playlistId)
+        .collection('messages')
+        .orderBy('timestamp')
+        .snapshots();
   }
 }

@@ -13,6 +13,7 @@ class PlaylistScreen extends StatelessWidget {
 
     final titleController = TextEditingController();
     final artistController = TextEditingController();
+    final messageController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(title: const Text("Playlist Room")),
@@ -55,6 +56,7 @@ class PlaylistScreen extends StatelessWidget {
           ),
 
           const Divider(),
+
           Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
@@ -95,6 +97,9 @@ class PlaylistScreen extends StatelessWidget {
               ],
             ),
           ),
+
+          const Divider(),
+
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: service.getSongs(playlistId),
@@ -116,15 +121,12 @@ class PlaylistScreen extends StatelessWidget {
 
                     return ListTile(
                       leading: const Icon(Icons.music_note),
-
                       title: Text(song['title']),
                       subtitle: Text(song['artist']),
-
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text("🔥 ${song['votes'] ?? 0}"),
-
+                          Text("${song['votes'] ?? 0}"),
                           IconButton(
                             icon: const Icon(Icons.thumb_up),
                             onPressed: () {
@@ -140,6 +142,75 @@ class PlaylistScreen extends StatelessWidget {
                   },
                 );
               },
+            ),
+          ),
+
+          Container(
+            height: 200,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              border: const Border(top: BorderSide(color: Colors.black12)),
+            ),
+            child: Column(
+              children: [
+                const Text(
+                  "Chat",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: service.getMessages(playlistId),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      final messages = snapshot.data!.docs;
+
+                      return ListView.builder(
+                        itemCount: messages.length,
+                        itemBuilder: (context, index) {
+                          final msg = messages[index];
+
+                          return ListTile(
+                            dense: true,
+                            title: Text(msg['text']),
+                            subtitle: Text("User: ${msg['senderId']}"),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: messageController,
+                        decoration: const InputDecoration(
+                          hintText: "Type a message",
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: () async {
+                        if (messageController.text.isEmpty) return;
+
+                        await service.sendMessage(
+                          playlistId: playlistId,
+                          text: messageController.text,
+                        );
+
+                        messageController.clear();
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
