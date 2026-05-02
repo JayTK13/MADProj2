@@ -41,18 +41,43 @@ class FirestoreService {
       'title': title,
       'artist': artist,
       'votes': 0,
-      'moodTags': [],
+      'voters': [],
       'addedBy': user.uid,
       'createdAt': Timestamp.now(),
     });
   }
 
-  Stream<QuerySnapshot> getPlaylists() {
-    return _db.collection('playlists').snapshots();
-  }
+  Future<void> voteSong({
+    required String playlistId,
+    required String songId,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
-  Stream<DocumentSnapshot> getPlaylist(String playlistId) {
-    return _db.collection('playlists').doc(playlistId).snapshots();
+    final songRef = _db
+        .collection('playlists')
+        .doc(playlistId)
+        .collection('songs')
+        .doc(songId);
+
+    await _db.runTransaction((transaction) async {
+      final snapshot = await transaction.get(songRef);
+
+      if (!snapshot.exists) return;
+
+      final data = snapshot.data() as Map<String, dynamic>;
+
+      final List voters = (data['voters'] ?? []);
+
+      if (voters.contains(user.uid)) {
+        return;
+      }
+
+      transaction.update(songRef, {
+        'votes': (data['votes'] ?? 0) + 1,
+        'voters': FieldValue.arrayUnion([user.uid]),
+      });
+    });
   }
 
   Stream<QuerySnapshot> getSongs(String playlistId) {
@@ -60,6 +85,7 @@ class FirestoreService {
         .collection('playlists')
         .doc(playlistId)
         .collection('songs')
+        .orderBy('votes', descending: true)
         .snapshots();
   }
 }
