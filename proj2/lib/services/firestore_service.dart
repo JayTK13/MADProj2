@@ -88,4 +88,16 @@ class FirestoreService {
         .orderBy('votes', descending: true)
         .snapshots();
   }
+
+  
+  Stream<List<QueryDocumentSnapshot>> getTopSongs(String playlistId) {
+  return _db
+      .collection('playlists')
+      .doc(playlistId)
+      .collection('songs')
+      .orderBy('votes', descending: true)
+      .limit(3)
+      .snapshots()
+      .map((snapshot) => snapshot.docs);
+  }
 }

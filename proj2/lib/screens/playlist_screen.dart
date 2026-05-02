@@ -55,7 +55,46 @@ class PlaylistScreen extends StatelessWidget {
           ),
 
           const Divider(),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Top Recommended Songs",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
 
+                const SizedBox(height: 10),
+
+                StreamBuilder<List<QueryDocumentSnapshot>>(
+                  stream: service.getTopSongs(playlistId),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const CircularProgressIndicator();
+                    }
+
+                    final songs = snapshot.data!;
+
+                    if (songs.isEmpty) {
+                      return const Text("No recommendations yet");
+                    }
+
+                    return Column(
+                      children: songs.map((song) {
+                        return ListTile(
+                          leading: const Icon(Icons.star, color: Colors.orange),
+                          title: Text(song['title']),
+                          subtitle: Text(song['artist']),
+                          trailing: Text("${song['votes']}"),
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: service.getSongs(playlistId),
