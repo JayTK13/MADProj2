@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:proj2/auth_gate.dart';
 import 'firebase_options.dart';
 import 'screens/test_firestore_screen.dart';
+import 'auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Vibzcheck',
       theme: ThemeData(primarySwatch: Colors.deepPurple),
-      home: const TestFirestoreScreen(),
+      home: const AuthGate(),
     );
   }
 }
