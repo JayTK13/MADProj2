@@ -15,7 +15,6 @@ class PlaylistScreen extends StatelessWidget {
 
     final titleController = TextEditingController();
     final artistController = TextEditingController();
-    final messageController = TextEditingController();
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -170,75 +169,107 @@ class PlaylistScreen extends StatelessWidget {
             ),
           ),
 
-          Container(
-            height: 200,
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              border: const Border(top: BorderSide(color: Colors.black12)),
-            ),
-            child: Column(
-              children: [
-                const Text(
-                  "Chat",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-
-                Expanded(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: service.getMessages(playlistId),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const CircularProgressIndicator();
-                      }
-
-                      final messages = snapshot.data!.docs;
-
-                      return ListView.builder(
-                        itemCount: messages.length,
-                        itemBuilder: (context, index) {
-                          final msg = messages[index];
-
-                          return ListTile(
-                            dense: true,
-                            title: Text(msg['text']),
-                            subtitle: Text("User: ${msg['senderId']}"),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: messageController,
-                        decoration: const InputDecoration(
-                          hintText: "Type a message",
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.send),
-                      onPressed: () async {
-                        if (messageController.text.isEmpty) return;
-
-                        await service.sendMessage(
-                          playlistId: playlistId,
-                          text: messageController.text,
-                        );
-
-                        messageController.clear();
-                      },
-                    ),
-                  ],
-                ),
-              ],
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.chat),
+              label: const Text("Open Chat"),
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (_) => ChatBottomSheet(playlistId: playlistId),
+                );
+              },
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ChatBottomSheet extends StatefulWidget {
+  final String playlistId;
+
+  const ChatBottomSheet({super.key, required this.playlistId});
+
+  @override
+  State<ChatBottomSheet> createState() => _ChatBottomSheetState();
+}
+
+class _ChatBottomSheetState extends State<ChatBottomSheet> {
+  final service = FirestoreService();
+  final messageController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        height: 400,
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            const Text("Chat", style: TextStyle(fontWeight: FontWeight.bold)),
+
+            const SizedBox(height: 10),
+
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: service.getMessages(widget.playlistId),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const CircularProgressIndicator();
+                  }
+
+                  final messages = snapshot.data!.docs;
+
+                  return ListView.builder(
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = messages[index];
+
+                      return ListTile(
+                        dense: true,
+                        title: Text(msg['text']),
+                        subtitle: Text("User: ${msg['senderId']}"),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: messageController,
+                    decoration: const InputDecoration(
+                      hintText: "Type a message",
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: () async {
+                    if (messageController.text.isEmpty) return;
+
+                    await service.sendMessage(
+                      playlistId: widget.playlistId,
+                      text: messageController.text,
+                    );
+
+                    messageController.clear();
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
