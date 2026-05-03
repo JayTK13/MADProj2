@@ -38,8 +38,13 @@ class SpotifyService {
 
     final tracks = data["tracks"]["items"];
 
-    return tracks.map<Map<String, String>>((track) {
-      return {"title": track["name"], "artist": track["artists"][0]["name"]};
-    }).toList();
+    return List<Map<String, String>>.from(
+      tracks.map((track) {
+        return {
+          "title": track["name"].toString(),
+          "artist": track["artists"][0]["name"].toString(),
+        };
+      }),
+    );
   }
 }
