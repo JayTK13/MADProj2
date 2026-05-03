@@ -308,7 +308,11 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
                       return ListTile(
                         dense: true,
                         title: Text(msg['text']),
-                        subtitle: Text("User: ${msg['senderId']}"),
+                        subtitle: Text(
+                          msg.data().toString().contains(msg['username'])
+                              ? msg['username']
+                              : "Unknown User",
+                        ),
                       );
                     },
                   );

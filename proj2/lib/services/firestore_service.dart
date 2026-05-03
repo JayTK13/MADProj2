@@ -107,6 +107,10 @@ class FirestoreService {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
+    final userDoc = await _db.collection('users').doc(user.uid).get();
+
+    final username = userDoc.data()?['username'] ?? "Unknown";
+
     await _db
         .collection('playlists')
         .doc(playlistId)
@@ -114,6 +118,7 @@ class FirestoreService {
         .add({
           'text': text,
           'senderId': user.uid,
+          'username': username,
           'timestamp': Timestamp.now(),
         });
   }
