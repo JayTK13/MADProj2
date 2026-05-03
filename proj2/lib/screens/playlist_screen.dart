@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../services/firestore_service.dart';
+import 'song_search_screen.dart';
 
 class PlaylistScreen extends StatelessWidget {
   final String playlistId;
@@ -25,7 +26,23 @@ class PlaylistScreen extends StatelessWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Playlist Room")),
+      appBar: AppBar(
+        title: const Text("Playlist Room"),
+
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SongSearchScreen(playlistId: playlistId),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
 
       body: Column(
         children: [
