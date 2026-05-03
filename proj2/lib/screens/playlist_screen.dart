@@ -304,15 +304,15 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final msg = messages[index];
+                      final data = msg.data() as Map<String, dynamic>;
+
+                      final text = data['text'] ?? "";
+                      final username = data['username'] ?? "Unknown User";
 
                       return ListTile(
                         dense: true,
-                        title: Text(msg['text']),
-                        subtitle: Text(
-                          msg.data().toString().contains(msg['username'])
-                              ? msg['username']
-                              : "Unknown User",
-                        ),
+                        title: Text(text),
+                        subtitle: Text(username),
                       );
                     },
                   );
