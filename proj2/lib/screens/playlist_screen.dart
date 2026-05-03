@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import '../services/firestore_service.dart';
 import 'song_search_screen.dart';
+import '../main.dart';
 
 class PlaylistScreen extends StatelessWidget {
   final String playlistId;
@@ -26,7 +27,18 @@ class PlaylistScreen extends StatelessWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Playlist Room")),
+      appBar: AppBar(
+        title: const Text("Playlist Room"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.dark_mode),
+            onPressed: () {
+              MyApp.of(context).toggleTheme();
+            },
+          ),
+        ],
+      ),
+
       body: SafeArea(
         child: Column(
           children: [
@@ -37,7 +49,7 @@ class PlaylistScreen extends StatelessWidget {
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(10),
-                      color: Colors.grey[200],
+                      color: Colors.blue,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
