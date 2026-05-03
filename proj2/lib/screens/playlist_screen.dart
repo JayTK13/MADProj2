@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import '../services/firestore_service.dart';
 
 class PlaylistScreen extends StatelessWidget {
@@ -14,6 +15,14 @@ class PlaylistScreen extends StatelessWidget {
     final titleController = TextEditingController();
     final artistController = TextEditingController();
     final messageController = TextEditingController();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message.notification?.title ?? "New Notification"),
+        ),
+      );
+    });
 
     return Scaffold(
       appBar: AppBar(title: const Text("Playlist Room")),
@@ -66,7 +75,6 @@ class PlaylistScreen extends StatelessWidget {
                   "Top Recommended Songs",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-
                 const SizedBox(height: 10),
 
                 StreamBuilder<List<QueryDocumentSnapshot>>(
