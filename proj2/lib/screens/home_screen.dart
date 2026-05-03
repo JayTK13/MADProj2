@@ -30,6 +30,7 @@ class HomeScreen extends StatelessWidget {
 
             const SizedBox(height: 10),
 
+            // When the "Create Playlist" button is pressed, it checks if the playlist name is not empty,
             ElevatedButton(
               onPressed: () async {
                 if (nameController.text.isEmpty) return;

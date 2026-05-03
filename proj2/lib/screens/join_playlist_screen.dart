@@ -9,6 +9,8 @@ class JoinPlaylistScreen extends StatefulWidget {
   State<JoinPlaylistScreen> createState() => _JoinPlaylistScreenState();
 }
 
+// This screen allows users to join an existing playlist by entering its ID.
+//It interacts with the FirestoreService to join the playlist and then navigates to the PlaylistScreen if successful.
 class _JoinPlaylistScreenState extends State<JoinPlaylistScreen> {
   final controller = TextEditingController();
   final service = FirestoreService();
@@ -24,6 +26,7 @@ class _JoinPlaylistScreenState extends State<JoinPlaylistScreen> {
     );
   }
 
+  // The build method constructs the UI for the join playlist screen.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

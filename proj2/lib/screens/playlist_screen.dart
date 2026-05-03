@@ -18,6 +18,7 @@ class PlaylistScreen extends StatelessWidget {
     final titleController = TextEditingController();
     final artistController = TextEditingController();
 
+    // Listen for incoming FCM messages and show a snackbar notification when a new message is received.
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -53,6 +54,7 @@ class PlaylistScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          // Display the playlist ID and provide a button to copy it to the clipboard for easy sharing with others.
                           Text(
                             "Room ID: $playlistId",
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -112,6 +114,7 @@ class PlaylistScreen extends StatelessWidget {
 
                           const SizedBox(height: 10),
 
+                          // Provide buttons to search for songs from Spotify and to view the list of songs in the playlist along with voting options.
                           ElevatedButton.icon(
                             icon: const Icon(Icons.search),
                             label: const Text("Search from Spotify"),
@@ -160,6 +163,7 @@ class PlaylistScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
 
+                          // Display the top recommended songs based on votes, allowing users to see which songs are most popular in the playlist.
                           StreamBuilder<List<QueryDocumentSnapshot>>(
                             stream: service.getTopSongs(playlistId),
                             builder: (context, snapshot) {
@@ -195,7 +199,7 @@ class PlaylistScreen extends StatelessWidget {
                 ),
               ),
             ),
-
+            // Provide a button to open the chat interfacce
             Padding(
               padding: const EdgeInsets.all(10),
               child: ElevatedButton.icon(
@@ -217,6 +221,7 @@ class PlaylistScreen extends StatelessWidget {
   }
 }
 
+// This widget displays the list of songs in the playlist along with their vote counts and provides a button for users to vote for their favorite songs.
 class SongListBottomSheet extends StatelessWidget {
   final String playlistId;
 
@@ -275,6 +280,7 @@ class SongListBottomSheet extends StatelessWidget {
   }
 }
 
+// This widget provides a chat interface for users in the playlist, allowing them to send and receive messages in real-time using Firestore as the backend.
 class ChatBottomSheet extends StatefulWidget {
   final String playlistId;
 
@@ -318,6 +324,7 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
                       final msg = messages[index];
                       final data = msg.data() as Map<String, dynamic>;
 
+                      // Extract the message text and username from the Firestore document, providing default values if they are not present.
                       final text = data['text'] ?? "";
                       final username = data['username'] ?? "Unknown User";
 

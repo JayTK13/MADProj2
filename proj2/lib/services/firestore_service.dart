@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-
+  //
   Future<String?> createPlaylist({required String name}) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return null;
@@ -20,6 +20,7 @@ class FirestoreService {
     return docRef.id;
   }
 
+  // This method allows a user to join an existing playlist by adding their user ID to the playlist's members array in Firestore.
   Future<void> joinPlaylist(String playlistId) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -37,6 +38,7 @@ class FirestoreService {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
+    // This method adds a new song to the specified playlist in Firestore, including details such as title, artist, and the user who added it.
     await _db.collection('playlists').doc(playlistId).collection('songs').add({
       'title': title,
       'artist': artist,
@@ -47,6 +49,9 @@ class FirestoreService {
     });
   }
 
+  // This method allows a user to vote for a song in a playlist.
+  //It checks if the user has already voted for the song and, if not,
+  //increments the vote count and adds the user's ID to the list of voters.
   Future<void> voteSong({
     required String playlistId,
     required String songId,
@@ -59,7 +64,7 @@ class FirestoreService {
         .doc(playlistId)
         .collection('songs')
         .doc(songId);
-
+    // The transaction ensures that the vote count is updated automatically
     await _db.runTransaction((transaction) async {
       final snapshot = await transaction.get(songRef);
 
@@ -89,6 +94,7 @@ class FirestoreService {
         .snapshots();
   }
 
+  // This method retrieves the top 3 songs from a playlist based on the number of votes.
   Stream<List<QueryDocumentSnapshot>> getTopSongs(String playlistId) {
     return _db
         .collection('playlists')
@@ -100,6 +106,7 @@ class FirestoreService {
         .map((snapshot) => snapshot.docs);
   }
 
+  //  This method allows a user to send a message in the context of a playlist.
   Future<void> sendMessage({
     required String playlistId,
     required String text,
@@ -123,6 +130,7 @@ class FirestoreService {
         });
   }
 
+  // This method retrieves the messages for a given playlist, ordered by timestamp.
   Stream<QuerySnapshot> getMessages(String playlistId) {
     return _db
         .collection('playlists')

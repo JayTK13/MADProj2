@@ -8,6 +8,7 @@ class TestFirestoreScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final db = FirebaseFirestore.instance;
 
+    // This screen is a testing interface for the Firestore database
     return Scaffold(
       appBar: AppBar(title: Text("Firestore Test")),
       body: StreamBuilder(
@@ -27,6 +28,7 @@ class TestFirestoreScreen extends StatelessWidget {
           );
         },
       ),
+      // A floating action button is provided to add a test playlist document to the Firestore database when pressed.
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           db.collection('playlists').add({

@@ -8,6 +8,8 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
+// This screen allows users to either log in or sign up using their email and password.
+//It toggles between login and sign-up modes based on user interaction.
 class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -23,6 +25,9 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // The build method constructs the UI for the login screen,
+  //including text fields for email and password, a submit button, and a toggle button
+  //to switch between login and sign-up modes.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
 import 'auth_gate.dart';
 
+// Background message handler for FCM
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print("Background Message: ${message.notification?.title}");
@@ -25,6 +26,7 @@ void main() async {
   runApp(const MyApp());
 }
 
+// Main app widget with theme toggling
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -35,6 +37,7 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
+// State class for MyApp to manage theme mode
 class _MyAppState extends State<MyApp> {
   bool isDarkMode = false;
 
@@ -44,6 +47,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  // Build method to set up MaterialApp with theme and home screen
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
