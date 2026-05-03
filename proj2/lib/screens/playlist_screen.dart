@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import '../services/firestore_service.dart';
 import 'song_search_screen.dart';
 
@@ -29,6 +30,32 @@ class PlaylistScreen extends StatelessWidget {
 
       body: Column(
         children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            color: Colors.grey[200],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Room ID: $playlistId",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.copy),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: playlistId));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Room ID copied to clipboard"),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+
           Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
