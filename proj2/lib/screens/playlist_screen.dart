@@ -103,6 +103,21 @@ class PlaylistScreen extends StatelessWidget {
                     );
                   },
                 ),
+
+                const SizedBox(height: 10),
+
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.music_note),
+                  label: const Text("View Songs & Vote"),
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (_) =>
+                          SongListBottomSheet(playlistId: playlistId),
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -149,52 +164,7 @@ class PlaylistScreen extends StatelessWidget {
             ),
           ),
 
-          const Divider(),
-
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: service.getSongs(playlistId),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                final songs = snapshot.data!.docs;
-
-                if (songs.isEmpty) {
-                  return const Center(child: Text("No song added yet"));
-                }
-
-                return ListView.builder(
-                  itemCount: songs.length,
-                  itemBuilder: (context, index) {
-                    final song = songs[index];
-
-                    return ListTile(
-                      leading: const Icon(Icons.music_note),
-                      title: Text(song['title']),
-                      subtitle: Text(song['artist']),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("${song['votes'] ?? 0}"),
-                          IconButton(
-                            icon: const Icon(Icons.thumb_up),
-                            onPressed: () {
-                              service.voteSong(
-                                playlistId: playlistId,
-                                songId: song.id,
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
+          const Spacer(),
 
           Padding(
             padding: const EdgeInsets.all(10),
@@ -211,6 +181,64 @@ class PlaylistScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class SongListBottomSheet extends StatelessWidget {
+  final String playlistId;
+
+  const SongListBottomSheet({super.key, required this.playlistId});
+
+  @override
+  Widget build(BuildContext context) {
+    final service = FirestoreService();
+
+    return Container(
+      height: 500,
+      padding: const EdgeInsets.all(10),
+      child: StreamBuilder<QuerySnapshot>(
+        stream: service.getSongs(playlistId),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final songs = snapshot.data!.docs;
+
+          if (songs.isEmpty) {
+            return const Center(child: Text("No songs yet"));
+          }
+
+          return ListView.builder(
+            itemCount: songs.length,
+            itemBuilder: (context, index) {
+              final song = songs[index];
+
+              return ListTile(
+                leading: const Icon(Icons.music_note),
+                title: Text(song['title']),
+                subtitle: Text(song['artist']),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("${song['votes'] ?? 0}"),
+                    IconButton(
+                      icon: const Icon(Icons.thumb_up),
+                      onPressed: () {
+                        service.voteSong(
+                          playlistId: playlistId,
+                          songId: song.id,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
@@ -241,7 +269,6 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
         child: Column(
           children: [
             const Text("Chat", style: TextStyle(fontWeight: FontWeight.bold)),
-
             const SizedBox(height: 10),
 
             Expanded(
