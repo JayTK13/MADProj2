@@ -27,160 +27,179 @@ class PlaylistScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Playlist Room")),
-
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(10),
-            color: Colors.grey[200],
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Room ID: $playlistId",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.copy),
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: playlistId));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Room ID copied to clipboard"),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(10),
+                      color: Colors.grey[200],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Room ID: $playlistId",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.copy),
+                            onPressed: () {
+                              Clipboard.setData(
+                                ClipboardData(text: playlistId),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Room ID copied to clipboard"),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
+                    ),
 
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              children: [
-                TextField(
-                  controller: titleController,
-                  decoration: const InputDecoration(labelText: "Song Title"),
-                ),
-                TextField(
-                  controller: artistController,
-                  decoration: const InputDecoration(labelText: "Artist"),
-                ),
-                const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: titleController,
+                            decoration: const InputDecoration(
+                              labelText: "Song Title",
+                            ),
+                          ),
+                          TextField(
+                            controller: artistController,
+                            decoration: const InputDecoration(
+                              labelText: "Artist",
+                            ),
+                          ),
+                          const SizedBox(height: 10),
 
-                ElevatedButton(
-                  onPressed: () async {
-                    if (titleController.text.isEmpty ||
-                        artistController.text.isEmpty)
-                      return;
+                          ElevatedButton(
+                            onPressed: () async {
+                              if (titleController.text.isEmpty ||
+                                  artistController.text.isEmpty)
+                                return;
 
-                    await service.addSong(
-                      playlistId: playlistId,
-                      title: titleController.text,
-                      artist: artistController.text,
-                    );
+                              await service.addSong(
+                                playlistId: playlistId,
+                                title: titleController.text,
+                                artist: artistController.text,
+                              );
 
-                    titleController.clear();
-                    artistController.clear();
-                  },
-                  child: const Text("Add Song"),
-                ),
+                              titleController.clear();
+                              artistController.clear();
+                            },
+                            child: const Text("Add Song"),
+                          ),
 
-                const SizedBox(height: 10),
+                          const SizedBox(height: 10),
 
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.search),
-                  label: const Text("Search from Spotify"),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            SongSearchScreen(playlistId: playlistId),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.search),
+                            label: const Text("Search from Spotify"),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      SongSearchScreen(playlistId: playlistId),
+                                ),
+                              );
+                            },
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.music_note),
+                            label: const Text("View Songs & Vote"),
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (_) =>
+                                    SongListBottomSheet(playlistId: playlistId),
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
+                    ),
 
-                const SizedBox(height: 10),
+                    const Divider(),
 
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.music_note),
-                  label: const Text("View Songs & Vote"),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (_) =>
-                          SongListBottomSheet(playlistId: playlistId),
-                    );
-                  },
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Top Recommended Songs",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+
+                          StreamBuilder<List<QueryDocumentSnapshot>>(
+                            stream: service.getTopSongs(playlistId),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return const CircularProgressIndicator();
+                              }
+
+                              final songs = snapshot.data!;
+
+                              if (songs.isEmpty) {
+                                return const Text("No recommendations yet");
+                              }
+
+                              return Column(
+                                children: songs.map((song) {
+                                  return ListTile(
+                                    leading: const Icon(
+                                      Icons.star,
+                                      color: Colors.orange,
+                                    ),
+                                    title: Text(song['title']),
+                                    subtitle: Text(song['artist']),
+                                    trailing: Text("${song['votes']}"),
+                                  );
+                                }).toList(),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
 
-          const Divider(),
-
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Top Recommended Songs",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-
-                StreamBuilder<List<QueryDocumentSnapshot>>(
-                  stream: service.getTopSongs(playlistId),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const CircularProgressIndicator();
-                    }
-
-                    final songs = snapshot.data!;
-
-                    if (songs.isEmpty) {
-                      return const Text("No recommendations yet");
-                    }
-
-                    return Column(
-                      children: songs.map((song) {
-                        return ListTile(
-                          leading: const Icon(Icons.star, color: Colors.orange),
-                          title: Text(song['title']),
-                          subtitle: Text(song['artist']),
-                          trailing: Text("${song['votes']}"),
-                        );
-                      }).toList(),
-                    );
-                  },
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.chat),
+                label: const Text("Open Chat"),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (_) => ChatBottomSheet(playlistId: playlistId),
+                  );
+                },
+              ),
             ),
-          ),
-
-          const Spacer(),
-
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: ElevatedButton.icon(
-              icon: const Icon(Icons.chat),
-              label: const Text("Open Chat"),
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (_) => ChatBottomSheet(playlistId: playlistId),
-                );
-              },
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
