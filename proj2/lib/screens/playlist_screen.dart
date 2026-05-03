@@ -26,23 +26,7 @@ class PlaylistScreen extends StatelessWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Playlist Room"),
-
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => SongSearchScreen(playlistId: playlistId),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text("Playlist Room")),
 
       body: Column(
         children: [
@@ -76,6 +60,22 @@ class PlaylistScreen extends StatelessWidget {
                     artistController.clear();
                   },
                   child: const Text("Add Song"),
+                ),
+
+                const SizedBox(height: 10),
+
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.search),
+                  label: const Text("Search from Spotify"),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            SongSearchScreen(playlistId: playlistId),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
