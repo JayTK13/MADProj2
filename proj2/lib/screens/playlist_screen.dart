@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import '../services/firestore_service.dart';
 import 'song_search_screen.dart';
 import '../main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PlaylistScreen extends StatelessWidget {
   final String playlistId;
@@ -37,9 +38,33 @@ class PlaylistScreen extends StatelessWidget {
               MyApp.of(context).toggleTheme();
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Text("Logout?"),
+                  content: const Text("Are you sure you want to log out?"),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Cancel"),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        await FirebaseAuth.instance.signOut();
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Logout"),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ],
       ),
-
       body: SafeArea(
         child: Column(
           children: [

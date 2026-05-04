@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  //
+  // This method creates a new playlist in Firestore with the specified name and the current user as the host
   Future<String?> createPlaylist({required String name}) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return null;
