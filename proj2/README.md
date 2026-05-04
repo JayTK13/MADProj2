@@ -98,7 +98,7 @@ Vibzcheck is a communal listening party app that utilizes the Spotify API to cre
 
 
 # Future Enhancements
-- User profiles with consistne usernames
+- User profiles with consistent usernames
 - Joinable public playlists list
 - Audio preview by using Spotify SDK
 - Spotify-based color-scheme
