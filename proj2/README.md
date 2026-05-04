@@ -93,7 +93,7 @@ Vibzcheck is a communal listening party app that utilizes the Spotify API to cre
 
 
 # Known Issues
-- Messages may display as "Unknown"
+- Messages may display as sent from "Unknown"
 - Mood tags are not visible
 
 
