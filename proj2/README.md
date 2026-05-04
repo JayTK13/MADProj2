@@ -109,5 +109,5 @@ Vibzcheck is a communal listening party app that utilizes the Spotify API to cre
 This project is liscensed under the MIT License.
 
 # Flutter Version
-- FLutter version: 3.41.5
+- Flutter version: 3.41.5
 - Dart version: 3.11.3
