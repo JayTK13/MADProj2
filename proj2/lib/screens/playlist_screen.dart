@@ -6,6 +6,7 @@ import '../services/firestore_service.dart';
 import 'song_search_screen.dart';
 import '../main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../auth_gate.dart';
 
 class PlaylistScreen extends StatelessWidget {
   final String playlistId;
@@ -51,10 +52,14 @@ class PlaylistScreen extends StatelessWidget {
                       onPressed: () => Navigator.pop(context),
                       child: const Text("Cancel"),
                     ),
+                    // Redirects user to login screen after a signout
                     TextButton(
                       onPressed: () async {
                         await FirebaseAuth.instance.signOut();
-                        Navigator.pop(context);
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => const AuthGate()),
+                          (route) => false,
+                        );
                       },
                       child: const Text("Logout"),
                     ),
